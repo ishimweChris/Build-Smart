@@ -68,6 +68,12 @@ $pages = array(
                 <p>Inclusive community engagement, socio-economic assessments, and tailored training programs.</p>
                 <a href="/services/community-engagement" class="btn btn-outline">Learn More</a>
             </div>
+            
+            <div class="service-card">
+                <h3>Real Estate Management & Property Maintenance</h3>
+                <p>Comprehensive property management including rental management, tenant coordination, and preventive maintenance.</p>
+                <a href="/services/real-estate-management" class="btn btn-outline">Learn More</a>
+            </div>
         </div>'
     ),
     array(
@@ -90,7 +96,7 @@ $pages = array(
         
         <p>We believe in creating spaces that are not only aesthetically pleasing but also sustainable, functional, and tailored to the unique needs of each community we serve.</p>
         
-        <a href="/contact" class="btn btn-primary">Discuss Your Project</a>'
+        <a href="/contact" class="btn btn-primary">Contact Us</a>'
     ),
     array(
         'title' => 'Engineering & Technical Services',
@@ -112,7 +118,7 @@ $pages = array(
         
         <p>We ensure that every project meets the highest technical and regulatory standards while optimizing cost-effectiveness and construction efficiency.</p>
         
-        <a href="/contact" class="btn btn-primary">Request a Consultation</a>'
+        <a href="/contact" class="btn btn-primary">Contact Us</a>'
     ),
     array(
         'title' => 'Project Management & Construction',
@@ -134,7 +140,7 @@ $pages = array(
         
         <p>From groundbreaking to final handover, we manage every aspect of your construction project with professionalism and precision.</p>
         
-        <a href="/contact" class="btn btn-primary">Start Your Project</a>'
+        <a href="/contact" class="btn btn-primary">Contact Us</a>'
     ),
     array(
         'title' => 'Community Engagement & Capacity Building',
@@ -156,7 +162,37 @@ $pages = array(
         
         <p>Our community-centered approach ensures that projects deliver lasting social and economic benefits to the communities we serve.</p>
         
-        <a href="/contact" class="btn btn-primary">Learn More</a>'
+        <a href="/contact" class="btn btn-primary">Contact Us</a>'
+    ),
+    array(
+        'title' => 'Real Estate Management & Property Maintenance',
+        'slug' => 'real-estate-management',
+        'parent' => 'Services',
+        'content' => '<h2>Real Estate Management & Property Maintenance</h2>
+        
+        <p>We now offer comprehensive real estate management services designed to protect, maintain, and maximize the value of your property. Our approach goes beyond traditional rental management — we provide both operational oversight and hands-on maintenance support to ensure your asset remains in excellent condition and delivers long-term returns.</p>
+        
+        <h3>Rental Management</h3>
+        <ul>
+            <li>Tenant sourcing and screening</li>
+            <li>Lease administration and renewals</li>
+            <li>Rent collection and financial reporting</li>
+            <li>Occupancy and performance monitoring</li>
+            <li>Coordination with tenants and stakeholders</li>
+        </ul>
+        
+        <h3>Property Maintenance</h3>
+        <ul>
+            <li>Preventive and corrective maintenance planning</li>
+            <li>Supervision of repairs and technical works</li>
+            <li>Vendor and contractor coordination</li>
+            <li>Regular property inspections</li>
+            <li>Rapid response to maintenance requests</li>
+        </ul>
+        
+        <p>Whether your property is residential, hospitality, or mixed-use, we ensure it is professionally managed, well-maintained, and operating efficiently. Our goal is to reduce your operational burden while preserving and enhancing the value of your investment.</p>
+        
+        <a href="/contact" class="btn btn-primary">Contact Us</a>'
     ),
     array(
         'title' => 'Contact',

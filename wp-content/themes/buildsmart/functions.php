@@ -126,6 +126,21 @@ function buildsmart_custom_post_types() {
         'supports' => array('title', 'editor', 'custom-fields'),
         'show_in_rest' => true,
     ));
+    
+    // Testimonials post type
+    register_post_type('testimonial', array(
+        'labels' => array(
+            'name' => __('Testimonials', 'buildsmart'),
+            'singular_name' => __('Testimonial', 'buildsmart'),
+            'add_new' => __('Add Testimonial', 'buildsmart'),
+            'add_new_item' => __('Add New Testimonial', 'buildsmart'),
+            'edit_item' => __('Edit Testimonial', 'buildsmart'),
+        ),
+        'public' => true,
+        'menu_icon' => 'dashicons-format-quote',
+        'supports' => array('title', 'editor', 'thumbnail'),
+        'show_in_rest' => true,
+    ));
 }
 add_action('init', 'buildsmart_custom_post_types');
 
@@ -187,6 +202,16 @@ function buildsmart_add_meta_boxes() {
         'normal',
         'high'
     );
+    
+    // Testimonial details
+    add_meta_box(
+        'testimonial_details',
+        __('Client Details', 'buildsmart'),
+        'buildsmart_testimonial_details_callback',
+        'testimonial',
+        'normal',
+        'high'
+    );
 }
 add_action('add_meta_boxes', 'buildsmart_add_meta_boxes');
 
@@ -241,10 +266,36 @@ function buildsmart_team_details_callback($post) {
     <?php
 }
 
+// Testimonial details callback
+function buildsmart_testimonial_details_callback($post) {
+    wp_nonce_field('buildsmart_testimonial_details', 'buildsmart_testimonial_nonce');
+    
+    $client_name = get_post_meta($post->ID, '_testimonial_client_name', true);
+    $client_position = get_post_meta($post->ID, '_testimonial_client_position', true);
+    $client_company = get_post_meta($post->ID, '_testimonial_client_company', true);
+    ?>
+    <p>
+        <label><strong><?php _e('Client Name:', 'buildsmart'); ?></strong></label><br>
+        <input type="text" name="testimonial_client_name" value="<?php echo esc_attr($client_name); ?>" style="width:100%;" placeholder="e.g. John Doe">
+    </p>
+    <p>
+        <label><strong><?php _e('Position/Title:', 'buildsmart'); ?></strong></label><br>
+        <input type="text" name="testimonial_client_position" value="<?php echo esc_attr($client_position); ?>" style="width:100%;" placeholder="e.g. CEO, Project Manager">
+    </p>
+    <p>
+        <label><strong><?php _e('Company/Organization:', 'buildsmart'); ?></strong></label><br>
+        <input type="text" name="testimonial_client_company" value="<?php echo esc_attr($client_company); ?>" style="width:100%;" placeholder="e.g. ABC Corporation">
+    </p>
+    <p style="color: #666; font-style: italic;">
+        <small>Add the testimonial quote in the main content editor above. You can also set a Featured Image for the client's photo.</small>
+    </p>
+    <?php
+}
+
 // Save meta box data
 function buildsmart_save_meta_boxes($post_id) {
     // Check nonce
-    if (!isset($_POST['buildsmart_project_nonce']) && !isset($_POST['buildsmart_team_nonce'])) {
+    if (!isset($_POST['buildsmart_project_nonce']) && !isset($_POST['buildsmart_team_nonce']) && !isset($_POST['buildsmart_testimonial_nonce'])) {
         return;
     }
     
@@ -253,6 +304,10 @@ function buildsmart_save_meta_boxes($post_id) {
     }
     
     if (isset($_POST['buildsmart_team_nonce']) && !wp_verify_nonce($_POST['buildsmart_team_nonce'], 'buildsmart_team_details')) {
+        return;
+    }
+    
+    if (isset($_POST['buildsmart_testimonial_nonce']) && !wp_verify_nonce($_POST['buildsmart_testimonial_nonce'], 'buildsmart_testimonial_details')) {
         return;
     }
     
@@ -289,6 +344,17 @@ function buildsmart_save_meta_boxes($post_id) {
     }
     if (isset($_POST['team_phone'])) {
         update_post_meta($post_id, '_team_phone', sanitize_text_field($_POST['team_phone']));
+    }
+    
+    // Save testimonial fields
+    if (isset($_POST['testimonial_client_name'])) {
+        update_post_meta($post_id, '_testimonial_client_name', sanitize_text_field($_POST['testimonial_client_name']));
+    }
+    if (isset($_POST['testimonial_client_position'])) {
+        update_post_meta($post_id, '_testimonial_client_position', sanitize_text_field($_POST['testimonial_client_position']));
+    }
+    if (isset($_POST['testimonial_client_company'])) {
+        update_post_meta($post_id, '_testimonial_client_company', sanitize_text_field($_POST['testimonial_client_company']));
     }
 }
 add_action('save_post', 'buildsmart_save_meta_boxes');
@@ -344,4 +410,43 @@ function buildsmart_get_hero_images() {
         }
     }
     return $images;
+}
+
+// ===================================
+// Theme Customizer - Client Logos
+// ===================================
+function buildsmart_client_logos_customizer($wp_customize) {
+    // Add Client Logos Section
+    $wp_customize->add_section('buildsmart_clients_section', array(
+        'title' => __('Client Logos', 'buildsmart'),
+        'description' => __('Add client/partner logos for the homepage. Recommended: PNG with transparent background, max 200x100px.', 'buildsmart'),
+        'priority' => 35,
+    ));
+    
+    // Add settings and controls for 8 client logos
+    for ($i = 1; $i <= 8; $i++) {
+        // Setting
+        $wp_customize->add_setting('client_logo_' . $i, array(
+            'default' => '',
+            'sanitize_callback' => 'esc_url_raw',
+        ));
+        
+        // Control
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'client_logo_' . $i, array(
+            'label' => sprintf(__('Client Logo %d', 'buildsmart'), $i),
+            'section' => 'buildsmart_clients_section',
+            'settings' => 'client_logo_' . $i,
+        )));
+    }
+}
+add_action('customize_register', 'buildsmart_client_logos_customizer');
+
+// Fallback menu when no menu is assigned
+function buildsmart_fallback_menu() {
+    echo '<ul class="main-menu">';
+    echo '<li><a href="' . esc_url(home_url('/')) . '">Home</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/about/')) . '">About Us</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/services/')) . '">Services</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/contact/')) . '">Contact Us</a></li>';
+    echo '</ul>';
 }

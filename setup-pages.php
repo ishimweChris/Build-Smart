@@ -46,6 +46,34 @@ $pages = array(
         'content' => '<h2>Community Engagement & Capacity Building</h2><p>Inclusive community engagement...</p>'
     ),
     array(
+        'title' => 'Real Estate Management & Property Maintenance',
+        'slug' => 'services/real-estate-management',
+        'parent' => 'services',
+        'content' => '<h2>Real Estate Management & Property Maintenance</h2>
+
+<p>We now offer comprehensive real estate management services designed to protect, maintain, and maximize the value of your property. Our approach goes beyond traditional rental management — we provide both operational oversight and hands-on maintenance support to ensure your asset remains in excellent condition and delivers long-term returns.</p>
+
+<h3>Rental Management</h3>
+<ul>
+<li>Tenant sourcing and screening</li>
+<li>Lease administration and renewals</li>
+<li>Rent collection and financial reporting</li>
+<li>Occupancy and performance monitoring</li>
+<li>Coordination with tenants and stakeholders</li>
+</ul>
+
+<h3>Property Maintenance</h3>
+<ul>
+<li>Preventive and corrective maintenance planning</li>
+<li>Supervision of repairs and technical works</li>
+<li>Vendor and contractor coordination</li>
+<li>Regular property inspections</li>
+<li>Rapid response to maintenance requests</li>
+</ul>
+
+<p>Whether your property is residential, hospitality, or mixed-use, we ensure it is professionally managed, well-maintained, and operating efficiently. Our goal is to reduce your operational burden while preserving and enhancing the value of your investment.</p>'
+    ),
+    array(
         'title' => 'Projects',
         'slug' => 'projects',
         'content' => '<h2>Our Projects</h2><p>View our portfolio of completed projects...</p>'

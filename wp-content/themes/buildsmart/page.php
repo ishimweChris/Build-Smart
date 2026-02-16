@@ -1,4 +1,25 @@
-<?php get_header(); ?>
+<?php
+/**
+ * Default page template
+ */
+
+// Check if this is a child page of Services
+$is_service_page = false;
+if ($post->post_parent) {
+    $parent = get_post($post->post_parent);
+    if ($parent && $parent->post_name === 'services') {
+        $is_service_page = true;
+    }
+}
+
+// If it's a service child page, use the service template
+if ($is_service_page) {
+    get_template_part('page-service-single');
+    return;
+}
+
+get_header();
+?>
 
 <div class="container section">
     <?php

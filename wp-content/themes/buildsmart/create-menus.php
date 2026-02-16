@@ -37,20 +37,14 @@ echo "<br><h2>Creating Primary Menu...</h2>";
 $home = get_page_by_path('home');
 $about = get_page_by_path('about');
 $services = get_page_by_path('services');
-$projects = get_page_by_path('projects');
 $contact = get_page_by_path('contact');
-$careers = get_page_by_path('careers');
-$blog = get_page_by_path('blog');
 
-// Add items to Primary Menu
+// Add items to Primary Menu (simplified: Home, About Us, Services, Contact Us)
 $menu_items = array(
     array('title' => 'Home', 'url' => home_url('/'), 'page' => $home),
-    array('title' => 'About', 'url' => '', 'page' => $about),
+    array('title' => 'About Us', 'url' => '', 'page' => $about),
     array('title' => 'Services', 'url' => '', 'page' => $services),
-    array('title' => 'Projects', 'url' => '', 'page' => $projects),
-    array('title' => 'Blog', 'url' => '', 'page' => $blog),
-    array('title' => 'Careers', 'url' => '', 'page' => $careers),
-    array('title' => 'Contact', 'url' => '', 'page' => $contact),
+    array('title' => 'Contact Us', 'url' => '', 'page' => $contact),
 );
 
 $menu_order = 1;
@@ -106,6 +100,7 @@ if ($services) {
             array('page' => $engineering, 'title' => 'Engineering Services'),
             array('page' => $project_mgmt, 'title' => 'Project Management'),
             array('page' => $community, 'title' => 'Community Engagement'),
+            array('page' => get_page_by_path('real-estate-management'), 'title' => 'Real Estate Management'),
         );
         
         foreach ($submenu_items as $subitem) {
@@ -137,10 +132,7 @@ $footer_menu_id = wp_create_nav_menu('Footer Menu');
 $footer_items = array(
     array('page' => $about, 'title' => 'About Us'),
     array('page' => $services, 'title' => 'Services'),
-    array('page' => $projects, 'title' => 'Projects'),
-    array('page' => $careers, 'title' => 'Careers'),
-    array('page' => $contact, 'title' => 'Contact'),
-    array('page' => get_page_by_path('privacy-policy'), 'title' => 'Privacy Policy'),
+    array('page' => $contact, 'title' => 'Contact Us'),
 );
 
 $footer_order = 1;
