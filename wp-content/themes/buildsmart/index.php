@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 <div class="container section">
-    <h1>Blog</h1>
+    <h1 style="text-align: center;">Blog</h1>
     
     <?php if (have_posts()) : ?>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-lg);">

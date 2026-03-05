@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 <div class="container section">
-    <h1><?php the_title(); ?></h1>
+    <h1 style="text-align: center;"><?php the_title(); ?></h1>
     
     <?php if (have_posts()) : ?>
         <div class="portfolio-grid" style="margin-top: var(--spacing-lg);">

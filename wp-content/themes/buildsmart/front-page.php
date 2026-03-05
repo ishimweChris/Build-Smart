@@ -200,7 +200,8 @@ get_header();
     </div>
 </section>
 
-<!-- Client Testimonials Section -->
+<!-- Client Testimonials Section - Hidden per client request -->
+<?php /* 
 <section class="section">
     <div class="container">
         <div style="text-align: center; margin-bottom: var(--spacing-lg);">
@@ -290,6 +291,7 @@ get_header();
         </div>
     </div>
 </section>
+*/ ?>
 
 <!-- About Section -->
 <section class="section" style="background: var(--dark-navy); color: var(--white);">

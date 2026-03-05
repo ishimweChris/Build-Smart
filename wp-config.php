@@ -6,7 +6,7 @@
 
 // ** Database settings ** //
 define('WP_CACHE', true);
-define( 'WPCACHEHOME', 'D:\xampp\htdocs\build\wp-content\plugins\wp-super-cache/' );
+define( 'WPCACHEHOME', 'C:\xampp\htdocs\build\wp-content\plugins\wp-super-cache/' );
 define( 'DB_NAME', 'buildsmart_db' );
 define( 'DB_USER', 'root' );
 define( 'DB_PASSWORD', '' );

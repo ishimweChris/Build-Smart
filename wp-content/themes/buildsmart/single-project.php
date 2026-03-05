@@ -4,7 +4,7 @@
     <article class="project-detail">
         <!-- Project Hero -->
         <div class="project-hero" style="background: var(--light-gray); padding: var(--spacing-lg) 0;">
-            <div class="container">
+            <div class="container" style="text-align: center;">
                 <h1><?php the_title(); ?></h1>
                 <?php
                 $location = get_post_meta(get_the_ID(), '_project_location', true);

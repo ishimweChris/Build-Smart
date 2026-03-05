@@ -27,7 +27,7 @@ get_header();
         while (have_posts()) : the_post();
             ?>
             <article <?php post_class(); ?>>
-                <h1><?php the_title(); ?></h1>
+                <h1 style="text-align: center;"><?php the_title(); ?></h1>
                 
                 <?php if (has_post_thumbnail()) : ?>
                     <div class="featured-image" style="margin: var(--spacing-md) 0;">

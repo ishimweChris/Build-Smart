@@ -9,8 +9,8 @@ get_header();
 
 <div class="container" style="padding-top: var(--spacing-lg); padding-bottom: var(--spacing-sm);">
     <article class="about-page">
-        <h1>About Build Smart LTD</h1>
-        <p class="tagline" style="color: var(--primary-green); font-size: 1.2rem; margin-bottom: var(--spacing-md);">Think Smart. Build Smart</p>
+        <h1 style="text-align: center;">About Build Smart LTD</h1>
+        <p class="tagline" style="color: var(--primary-green); font-size: 1.2rem; margin-bottom: var(--spacing-md); text-align: center;">Think Smart. Build Smart</p>
         
         <div class="about-intro">
             <p>Build Smart is a Rwanda-based company specializing in community-driven and affordable housing solutions. Drawing on over a decade of regional experience from our team across Rwanda, Burundi, and the Democratic Republic of the Congo (South Kivu), our multidisciplinary team brings strong local insight, practical field experience, and time-tested partnerships to every project.</p>
