@@ -703,6 +703,9 @@ p {
     gap: var(--spacing-md);
     align-items: center;
     justify-items: center;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .client-logo {
@@ -713,6 +716,8 @@ p {
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .client-logo:hover {
@@ -815,11 +820,36 @@ p {
 
 @media (max-width: 768px) {
     .clients-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+        padding: 0 var(--spacing-xs);
+    }
+    
+    .client-logo {
+        padding: var(--spacing-xs);
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .client-logo img {
+        max-width: 100%;
+        max-height: 60px;
+        width: auto;
     }
     
     .testimonials-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .clients-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .client-logo img {
+        max-height: 50px;
     }
 }
 
