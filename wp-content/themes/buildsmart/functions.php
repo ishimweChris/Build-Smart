@@ -141,6 +141,27 @@ function buildsmart_custom_post_types() {
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_rest' => true,
     ));
+    
+    // Gallery Images post type (for standalone gallery management)
+    register_post_type('gallery_image', array(
+        'labels' => array(
+            'name' => __('Gallery', 'buildsmart'),
+            'singular_name' => __('Gallery Image', 'buildsmart'),
+            'add_new' => __('Add Image', 'buildsmart'),
+            'add_new_item' => __('Add New Gallery Image', 'buildsmart'),
+            'edit_item' => __('Edit Gallery Image', 'buildsmart'),
+            'new_item' => __('New Gallery Image', 'buildsmart'),
+            'view_item' => __('View Image', 'buildsmart'),
+            'search_items' => __('Search Gallery', 'buildsmart'),
+            'not_found' => __('No images found', 'buildsmart'),
+            'menu_name' => __('Gallery', 'buildsmart'),
+        ),
+        'public' => true,
+        'menu_icon' => 'dashicons-format-gallery',
+        'supports' => array('title', 'thumbnail'),
+        'show_in_rest' => true,
+        'has_archive' => false,
+    ));
 }
 add_action('init', 'buildsmart_custom_post_types');
 
@@ -165,6 +186,20 @@ function buildsmart_custom_taxonomies() {
         ),
         'hierarchical' => false,
         'show_in_rest' => true,
+    ));
+    
+    // Gallery categories (for standalone gallery images)
+    register_taxonomy('gallery_category', 'gallery_image', array(
+        'labels' => array(
+            'name' => __('Gallery Categories', 'buildsmart'),
+            'singular_name' => __('Gallery Category', 'buildsmart'),
+            'add_new_item' => __('Add New Category', 'buildsmart'),
+            'edit_item' => __('Edit Category', 'buildsmart'),
+        ),
+        'hierarchical' => true,
+        'show_in_rest' => true,
+        'show_admin_column' => true,
+        'rewrite' => array('slug' => 'gallery-category'),
     ));
 }
 add_action('init', 'buildsmart_custom_taxonomies');

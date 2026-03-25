@@ -2,7 +2,7 @@
 /**
  * Template Name: Gallery
  * 
- * Displays all project images with filtering by project
+ * Displays all project images AND standalone gallery images with filtering
  * 
  * @package BuildSmart
  */
@@ -30,22 +30,60 @@ get_header(); ?>
             'orderby' => 'title',
             'order' => 'ASC'
         ));
+        
+        // Get all gallery categories
+        $gallery_categories = get_terms(array(
+            'taxonomy' => 'gallery_category',
+            'hide_empty' => true,
+        ));
+        
+        // Check if there are standalone gallery images without category (Other)
+        $uncategorized_gallery = get_posts(array(
+            'post_type' => 'gallery_image',
+            'posts_per_page' => 1,
+            'post_status' => 'publish',
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'gallery_category',
+                    'operator' => 'NOT EXISTS',
+                ),
+            ),
+        ));
+        $has_other = !empty($uncategorized_gallery);
         ?>
 
         <!-- Filter Buttons -->
         <div class="gallery-filters">
-            <button class="filter-btn active" data-filter="all">All Projects</button>
+            <button class="filter-btn active" data-filter="all">All</button>
+            
+            <?php // Project filters ?>
             <?php foreach ($projects as $project) : ?>
                 <button class="filter-btn" data-filter="project-<?php echo $project->ID; ?>">
                     <?php echo esc_html($project->post_title); ?>
                 </button>
             <?php endforeach; ?>
+            
+            <?php // Gallery category filters ?>
+            <?php if (!is_wp_error($gallery_categories) && !empty($gallery_categories)) : ?>
+                <?php foreach ($gallery_categories as $category) : ?>
+                    <button class="filter-btn" data-filter="category-<?php echo $category->term_id; ?>">
+                        <?php echo esc_html($category->name); ?>
+                    </button>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            
+            <?php // Other (uncategorized) filter ?>
+            <?php if ($has_other) : ?>
+                <button class="filter-btn" data-filter="other">Other</button>
+            <?php endif; ?>
         </div>
 
         <!-- Gallery Grid -->
         <div class="gallery-grid">
             <?php
-            // Loop through each project and get its images
+            // ============================================
+            // PART 1: Images from Projects
+            // ============================================
             foreach ($projects as $project) :
                 $project_id = $project->ID;
                 $project_title = $project->post_title;
@@ -76,7 +114,7 @@ get_header(); ?>
                     'post_mime_type' => 'image',
                     'post_parent' => $project_id,
                     'posts_per_page' => -1,
-                    'exclude' => array(get_post_thumbnail_id($project_id)) // Exclude featured image
+                    'exclude' => array(get_post_thumbnail_id($project_id))
                 ));
                 
                 foreach ($attachments as $attachment) :
@@ -96,14 +134,14 @@ get_header(); ?>
                     </div>
                 <?php endforeach;
                 
-                // Also check for gallery images in post content (WordPress gallery shortcode)
+                // Check for gallery shortcodes in content
                 $content = $project->post_content;
                 if (preg_match_all('/\[gallery.*?ids="([^"]+)"/', $content, $matches)) {
                     foreach ($matches[1] as $ids_string) {
                         $image_ids = explode(',', $ids_string);
                         foreach ($image_ids as $img_id) {
                             $img_id = trim($img_id);
-                            if ($img_id == get_post_thumbnail_id($project_id)) continue; // Skip featured
+                            if ($img_id == get_post_thumbnail_id($project_id)) continue;
                             
                             $img_url = wp_get_attachment_image_url($img_id, 'large');
                             $img_full = wp_get_attachment_image_url($img_id, 'full');
@@ -125,15 +163,64 @@ get_header(); ?>
                         }
                     }
                 }
-                
             endforeach;
-            ?>
+            
+            // ============================================
+            // PART 2: Standalone Gallery Images (with categories)
+            // ============================================
+            $gallery_images = get_posts(array(
+                'post_type' => 'gallery_image',
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'orderby' => 'date',
+                'order' => 'DESC'
+            ));
+            
+            foreach ($gallery_images as $gallery_item) :
+                if (!has_post_thumbnail($gallery_item->ID)) continue;
+                
+                $item_id = $gallery_item->ID;
+                $item_title = $gallery_item->post_title;
+                $thumb_id = get_post_thumbnail_id($item_id);
+                $thumb_url = wp_get_attachment_image_url($thumb_id, 'large');
+                $thumb_full = wp_get_attachment_image_url($thumb_id, 'full');
+                $thumb_alt = get_post_meta($thumb_id, '_wp_attachment_image_alt', true);
+                if (!$thumb_alt) $thumb_alt = $item_title;
+                
+                // Get categories for this gallery image
+                $item_categories = get_the_terms($item_id, 'gallery_category');
+                $category_classes = '';
+                $category_name = 'Other';
+                $data_project = 'other';
+                
+                if (!is_wp_error($item_categories) && !empty($item_categories)) {
+                    $category_classes = array();
+                    foreach ($item_categories as $cat) {
+                        $category_classes[] = 'category-' . $cat->term_id;
+                    }
+                    $category_classes = implode(' ', $category_classes);
+                    $category_name = $item_categories[0]->name;
+                    $data_project = 'category-' . $item_categories[0]->term_id;
+                }
+                ?>
+                <div class="gallery-item <?php echo esc_attr($category_classes); ?>" data-project="<?php echo esc_attr($data_project); ?>">
+                    <a href="<?php echo esc_url($thumb_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($item_title); ?>">
+                        <img src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr($thumb_alt); ?>">
+                        <div class="gallery-item-overlay">
+                            <span class="gallery-item-title"><?php echo esc_html($item_title); ?></span>
+                            <span class="gallery-item-category"><?php echo esc_html($category_name); ?></span>
+                            <span class="gallery-item-icon">+</span>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
         </div>
 
-        <?php if (empty($projects)) : ?>
+        <?php if (empty($projects) && empty($gallery_images)) : ?>
             <div class="no-projects" style="text-align: center; padding: var(--spacing-lg);">
-                <p style="font-size: 1.2rem;">No projects found. Add some projects to display the gallery.</p>
-                <a href="<?php echo admin_url('post-new.php?post_type=project'); ?>" class="btn btn-primary">Add Project</a>
+                <p style="font-size: 1.2rem;">No images found. Add projects or gallery images to display.</p>
+                <a href="<?php echo admin_url('post-new.php?post_type=project'); ?>" class="btn btn-primary" style="margin-right: 10px;">Add Project</a>
+                <a href="<?php echo admin_url('post-new.php?post_type=gallery_image'); ?>" class="btn btn-outline">Add Gallery Image</a>
             </div>
         <?php endif; ?>
     </div>
@@ -233,6 +320,13 @@ get_header(); ?>
     color: var(--white);
     font-size: 1.1rem;
     font-weight: 600;
+}
+
+.gallery-item-category {
+    color: var(--primary-green);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 4px;
 }
 
 .gallery-item-icon {
