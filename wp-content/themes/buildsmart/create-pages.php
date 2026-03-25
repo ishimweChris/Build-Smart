@@ -195,6 +195,13 @@ $pages = array(
         <a href="/contact" class="btn btn-primary">Contact Us</a>'
     ),
     array(
+        'title' => 'Gallery',
+        'slug' => 'gallery',
+        'template' => 'page-gallery.php',
+        'content' => '<h2>Project Gallery</h2>
+        <p>Browse our portfolio of completed projects. Use the filter buttons to view images from specific projects.</p>'
+    ),
+    array(
         'title' => 'Contact',
         'slug' => 'contact',
         'content' => '<h2>Get In Touch</h2>
@@ -318,7 +325,13 @@ foreach ($pages as $page_data) {
     $page_id = wp_insert_post($new_page);
     
     if ($page_id) {
-        echo "✅ Created: <strong>{$page_data['title']}</strong> (ID: {$page_id})<br>";
+        // Set page template if specified
+        if (isset($page_data['template'])) {
+            update_post_meta($page_id, '_wp_page_template', $page_data['template']);
+            echo "✅ Created: <strong>{$page_data['title']}</strong> (ID: {$page_id}) with template: {$page_data['template']}<br>";
+        } else {
+            echo "✅ Created: <strong>{$page_data['title']}</strong> (ID: {$page_id})<br>";
+        }
         $created_count++;
     } else {
         echo "❌ Failed: <strong>{$page_data['title']}</strong><br>";

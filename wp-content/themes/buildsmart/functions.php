@@ -447,6 +447,7 @@ function buildsmart_fallback_menu() {
     echo '<li><a href="' . esc_url(home_url('/')) . '">Home</a></li>';
     echo '<li><a href="' . esc_url(home_url('/about/')) . '">About Us</a></li>';
     echo '<li><a href="' . esc_url(home_url('/services/')) . '">Services</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/gallery/')) . '">Gallery</a></li>';
     echo '<li><a href="' . esc_url(home_url('/contact/')) . '">Contact Us</a></li>';
     echo '</ul>';
 }

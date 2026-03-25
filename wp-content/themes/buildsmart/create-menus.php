@@ -37,13 +37,15 @@ echo "<br><h2>Creating Primary Menu...</h2>";
 $home = get_page_by_path('home');
 $about = get_page_by_path('about');
 $services = get_page_by_path('services');
+$gallery = get_page_by_path('gallery');
 $contact = get_page_by_path('contact');
 
-// Add items to Primary Menu (simplified: Home, About Us, Services, Contact Us)
+// Add items to Primary Menu (Home, About Us, Services, Gallery, Contact Us)
 $menu_items = array(
     array('title' => 'Home', 'url' => home_url('/'), 'page' => $home),
     array('title' => 'About Us', 'url' => '', 'page' => $about),
     array('title' => 'Services', 'url' => '', 'page' => $services),
+    array('title' => 'Gallery', 'url' => '', 'page' => $gallery),
     array('title' => 'Contact Us', 'url' => '', 'page' => $contact),
 );
 
