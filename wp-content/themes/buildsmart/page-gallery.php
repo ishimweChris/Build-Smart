@@ -108,61 +108,33 @@ get_header(); ?>
                     </div>
                 <?php endif;
                 
-                // Get images attached to the project post
-                $attachments = get_posts(array(
-                    'post_type' => 'attachment',
-                    'post_mime_type' => 'image',
-                    'post_parent' => $project_id,
-                    'posts_per_page' => -1,
-                    'exclude' => array(get_post_thumbnail_id($project_id))
-                ));
+                // Get gallery images from dedicated meta field (not from content)
+                $gallery_image_ids = get_post_meta($project_id, '_project_gallery_images', true);
+                if ($gallery_image_ids) :
+                    $image_ids = array_filter(explode(',', $gallery_image_ids));
+                    foreach ($image_ids as $img_id) :
+                        $img_id = trim($img_id);
+                        if (!$img_id) continue;
+                        
+                        $img_url = wp_get_attachment_image_url($img_id, 'large');
+                        $img_full = wp_get_attachment_image_url($img_id, 'full');
+                        if (!$img_url) continue;
+                        
+                        $img_alt = get_post_meta($img_id, '_wp_attachment_image_alt', true);
+                        if (!$img_alt) $img_alt = $project_title;
+                        ?>
+                        <div class="gallery-item <?php echo esc_attr($project_slug); ?>" data-project="<?php echo esc_attr($project_slug); ?>">
+                            <a href="<?php echo esc_url($img_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($project_title); ?>">
+                                <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>">
+                                <div class="gallery-item-overlay">
+                                    <span class="gallery-item-title"><?php echo esc_html($project_title); ?></span>
+                                    <span class="gallery-item-icon">+</span>
+                                </div>
+                            </a>
+                        </div>
+                    <?php endforeach;
+                endif;
                 
-                foreach ($attachments as $attachment) :
-                    $img_url = wp_get_attachment_image_url($attachment->ID, 'large');
-                    $img_full = wp_get_attachment_image_url($attachment->ID, 'full');
-                    $img_alt = get_post_meta($attachment->ID, '_wp_attachment_image_alt', true);
-                    if (!$img_alt) $img_alt = $project_title . ' - ' . $attachment->post_title;
-                    ?>
-                    <div class="gallery-item <?php echo esc_attr($project_slug); ?>" data-project="<?php echo esc_attr($project_slug); ?>">
-                        <a href="<?php echo esc_url($img_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($project_title); ?>">
-                            <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>">
-                            <div class="gallery-item-overlay">
-                                <span class="gallery-item-title"><?php echo esc_html($project_title); ?></span>
-                                <span class="gallery-item-icon">+</span>
-                            </div>
-                        </a>
-                    </div>
-                <?php endforeach;
-                
-                // Check for gallery shortcodes in content
-                $content = $project->post_content;
-                if (preg_match_all('/\[gallery.*?ids="([^"]+)"/', $content, $matches)) {
-                    foreach ($matches[1] as $ids_string) {
-                        $image_ids = explode(',', $ids_string);
-                        foreach ($image_ids as $img_id) {
-                            $img_id = trim($img_id);
-                            if ($img_id == get_post_thumbnail_id($project_id)) continue;
-                            
-                            $img_url = wp_get_attachment_image_url($img_id, 'large');
-                            $img_full = wp_get_attachment_image_url($img_id, 'full');
-                            if (!$img_url) continue;
-                            
-                            $img_alt = get_post_meta($img_id, '_wp_attachment_image_alt', true);
-                            if (!$img_alt) $img_alt = $project_title;
-                            ?>
-                            <div class="gallery-item <?php echo esc_attr($project_slug); ?>" data-project="<?php echo esc_attr($project_slug); ?>">
-                                <a href="<?php echo esc_url($img_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($project_title); ?>">
-                                    <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>">
-                                    <div class="gallery-item-overlay">
-                                        <span class="gallery-item-title"><?php echo esc_html($project_title); ?></span>
-                                        <span class="gallery-item-icon">+</span>
-                                    </div>
-                                </a>
-                            </div>
-                            <?php
-                        }
-                    }
-                }
             endforeach;
             
             // ============================================

@@ -50,6 +50,15 @@ function buildsmart_scripts() {
 }
 add_action('wp_enqueue_scripts', 'buildsmart_scripts');
 
+// Enqueue media uploader for project gallery
+function buildsmart_admin_scripts($hook) {
+    global $post_type;
+    if (($hook == 'post.php' || $hook == 'post-new.php') && $post_type == 'project') {
+        wp_enqueue_media();
+    }
+}
+add_action('admin_enqueue_scripts', 'buildsmart_admin_scripts');
+
 // Register widget areas
 function buildsmart_widgets_init() {
     // Sidebar
@@ -228,6 +237,16 @@ function buildsmart_add_meta_boxes() {
         'high'
     );
     
+    // Project gallery images (for gallery page only)
+    add_meta_box(
+        'project_gallery',
+        __('Gallery Images (for Gallery page only)', 'buildsmart'),
+        'buildsmart_project_gallery_callback',
+        'project',
+        'normal',
+        'default'
+    );
+    
     // Team member details
     add_meta_box(
         'team_details',
@@ -249,6 +268,87 @@ function buildsmart_add_meta_boxes() {
     );
 }
 add_action('add_meta_boxes', 'buildsmart_add_meta_boxes');
+
+// Project gallery callback
+function buildsmart_project_gallery_callback($post) {
+    wp_nonce_field('buildsmart_project_gallery', 'buildsmart_gallery_nonce');
+    
+    $gallery_images = get_post_meta($post->ID, '_project_gallery_images', true);
+    $gallery_images = $gallery_images ? explode(',', $gallery_images) : array();
+    ?>
+    <p style="color: #666; margin-bottom: 15px;">
+        <em>These images will ONLY appear on the Gallery page, not on this project's detail page.</em>
+    </p>
+    
+    <div id="project-gallery-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+        <?php foreach ($gallery_images as $image_id) : 
+            $image_id = trim($image_id);
+            if (!$image_id) continue;
+            $image_url = wp_get_attachment_image_url($image_id, 'thumbnail');
+            if ($image_url) :
+        ?>
+            <div class="gallery-image-item" data-id="<?php echo esc_attr($image_id); ?>" style="position: relative;">
+                <img src="<?php echo esc_url($image_url); ?>" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
+                <button type="button" class="remove-gallery-image" style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 1;">&times;</button>
+            </div>
+        <?php endif; endforeach; ?>
+    </div>
+    
+    <input type="hidden" name="project_gallery_images" id="project_gallery_images" value="<?php echo esc_attr(implode(',', $gallery_images)); ?>">
+    
+    <button type="button" id="add-gallery-images" class="button button-secondary">
+        Add Gallery Images
+    </button>
+    
+    <script>
+    jQuery(document).ready(function($) {
+        // Add images
+        $('#add-gallery-images').on('click', function(e) {
+            e.preventDefault();
+            
+            var frame = wp.media({
+                title: 'Select Gallery Images',
+                multiple: true,
+                library: { type: 'image' }
+            });
+            
+            frame.on('select', function() {
+                var selection = frame.state().get('selection');
+                var currentIds = $('#project_gallery_images').val();
+                var idsArray = currentIds ? currentIds.split(',').filter(Boolean) : [];
+                
+                selection.each(function(attachment) {
+                    attachment = attachment.toJSON();
+                    if (idsArray.indexOf(attachment.id.toString()) === -1) {
+                        idsArray.push(attachment.id);
+                        var thumbUrl = attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;
+                        var html = '<div class="gallery-image-item" data-id="' + attachment.id + '" style="position: relative;">' +
+                            '<img src="' + thumbUrl + '" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">' +
+                            '<button type="button" class="remove-gallery-image" style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 1;">&times;</button>' +
+                            '</div>';
+                        $('#project-gallery-container').append(html);
+                    }
+                });
+                
+                $('#project_gallery_images').val(idsArray.join(','));
+            });
+            
+            frame.open();
+        });
+        
+        // Remove image
+        $(document).on('click', '.remove-gallery-image', function() {
+            var item = $(this).parent();
+            var removeId = item.data('id').toString();
+            var currentIds = $('#project_gallery_images').val().split(',').filter(Boolean);
+            currentIds = currentIds.filter(function(id) { return id !== removeId; });
+            $('#project_gallery_images').val(currentIds.join(','));
+            item.remove();
+        });
+    });
+    </script>
+    <?php
+}
 
 // Project details callback
 function buildsmart_project_details_callback($post) {
@@ -330,7 +430,7 @@ function buildsmart_testimonial_details_callback($post) {
 // Save meta box data
 function buildsmart_save_meta_boxes($post_id) {
     // Check nonce
-    if (!isset($_POST['buildsmart_project_nonce']) && !isset($_POST['buildsmart_team_nonce']) && !isset($_POST['buildsmart_testimonial_nonce'])) {
+    if (!isset($_POST['buildsmart_project_nonce']) && !isset($_POST['buildsmart_team_nonce']) && !isset($_POST['buildsmart_testimonial_nonce']) && !isset($_POST['buildsmart_gallery_nonce'])) {
         return;
     }
     
@@ -368,6 +468,12 @@ function buildsmart_save_meta_boxes($post_id) {
     }
     if (isset($_POST['project_area'])) {
         update_post_meta($post_id, '_project_area', sanitize_text_field($_POST['project_area']));
+    }
+    
+    // Save project gallery images
+    if (isset($_POST['project_gallery_images'])) {
+        $gallery_images = sanitize_text_field($_POST['project_gallery_images']);
+        update_post_meta($post_id, '_project_gallery_images', $gallery_images);
     }
     
     // Save team fields
