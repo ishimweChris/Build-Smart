@@ -22,15 +22,6 @@ get_header(); ?>
 
     <div class="container section">
         <?php
-        // Get all projects for filter buttons
-        $projects = get_posts(array(
-            'post_type' => 'project',
-            'posts_per_page' => -1,
-            'post_status' => 'publish',
-            'orderby' => 'title',
-            'order' => 'ASC'
-        ));
-        
         // Get all gallery categories
         $gallery_categories = get_terms(array(
             'taxonomy' => 'gallery_category',
@@ -56,13 +47,6 @@ get_header(); ?>
         <div class="gallery-filters">
             <button class="filter-btn active" data-filter="all">All</button>
             
-            <?php // Project filters ?>
-            <?php foreach ($projects as $project) : ?>
-                <button class="filter-btn" data-filter="project-<?php echo $project->ID; ?>">
-                    <?php echo esc_html($project->post_title); ?>
-                </button>
-            <?php endforeach; ?>
-            
             <?php // Gallery category filters ?>
             <?php if (!is_wp_error($gallery_categories) && !empty($gallery_categories)) : ?>
                 <?php foreach ($gallery_categories as $category) : ?>
@@ -82,63 +66,7 @@ get_header(); ?>
         <div class="gallery-grid">
             <?php
             // ============================================
-            // PART 1: Images from Projects
-            // ============================================
-            foreach ($projects as $project) :
-                $project_id = $project->ID;
-                $project_title = $project->post_title;
-                $project_slug = 'project-' . $project_id;
-                
-                // Get featured image
-                if (has_post_thumbnail($project_id)) :
-                    $thumb_id = get_post_thumbnail_id($project_id);
-                    $thumb_url = wp_get_attachment_image_url($thumb_id, 'large');
-                    $thumb_full = wp_get_attachment_image_url($thumb_id, 'full');
-                    $thumb_alt = get_post_meta($thumb_id, '_wp_attachment_image_alt', true);
-                    if (!$thumb_alt) $thumb_alt = $project_title;
-                    ?>
-                    <div class="gallery-item <?php echo esc_attr($project_slug); ?>" data-project="<?php echo esc_attr($project_slug); ?>">
-                        <a href="<?php echo esc_url($thumb_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($project_title); ?>">
-                            <img src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr($thumb_alt); ?>">
-                            <div class="gallery-item-overlay">
-                                <span class="gallery-item-title"><?php echo esc_html($project_title); ?></span>
-                                <span class="gallery-item-icon">+</span>
-                            </div>
-                        </a>
-                    </div>
-                <?php endif;
-                
-                // Get gallery images from dedicated meta field (not from content)
-                $gallery_image_ids = get_post_meta($project_id, '_project_gallery_images', true);
-                if ($gallery_image_ids) :
-                    $image_ids = array_filter(explode(',', $gallery_image_ids));
-                    foreach ($image_ids as $img_id) :
-                        $img_id = trim($img_id);
-                        if (!$img_id) continue;
-                        
-                        $img_url = wp_get_attachment_image_url($img_id, 'large');
-                        $img_full = wp_get_attachment_image_url($img_id, 'full');
-                        if (!$img_url) continue;
-                        
-                        $img_alt = get_post_meta($img_id, '_wp_attachment_image_alt', true);
-                        if (!$img_alt) $img_alt = $project_title;
-                        ?>
-                        <div class="gallery-item <?php echo esc_attr($project_slug); ?>" data-project="<?php echo esc_attr($project_slug); ?>">
-                            <a href="<?php echo esc_url($img_full); ?>" class="gallery-lightbox" data-title="<?php echo esc_attr($project_title); ?>">
-                                <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>">
-                                <div class="gallery-item-overlay">
-                                    <span class="gallery-item-title"><?php echo esc_html($project_title); ?></span>
-                                    <span class="gallery-item-icon">+</span>
-                                </div>
-                            </a>
-                        </div>
-                    <?php endforeach;
-                endif;
-                
-            endforeach;
-            
-            // ============================================
-            // PART 2: Standalone Gallery Images (with categories)
+            // Gallery Images (standalone gallery post type)
             // ============================================
             $gallery_images = get_posts(array(
                 'post_type' => 'gallery_image',
@@ -188,11 +116,10 @@ get_header(); ?>
             <?php endforeach; ?>
         </div>
 
-        <?php if (empty($projects) && empty($gallery_images)) : ?>
+        <?php if (empty($gallery_images)) : ?>
             <div class="no-projects" style="text-align: center; padding: var(--spacing-lg);">
-                <p style="font-size: 1.2rem;">No images found. Add projects or gallery images to display.</p>
-                <a href="<?php echo admin_url('post-new.php?post_type=project'); ?>" class="btn btn-primary" style="margin-right: 10px;">Add Project</a>
-                <a href="<?php echo admin_url('post-new.php?post_type=gallery_image'); ?>" class="btn btn-outline">Add Gallery Image</a>
+                <p style="font-size: 1.2rem;">No gallery images found.</p>
+                <a href="<?php echo admin_url('post-new.php?post_type=gallery_image'); ?>" class="btn btn-primary">Add Gallery Image</a>
             </div>
         <?php endif; ?>
     </div>
